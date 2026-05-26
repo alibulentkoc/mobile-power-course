@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engine Families Explorer — Mobile Power Course</title>
+<style>
+  :root {
+    --bg:       #f5f5f0;
+    --surface:  #ffffff;
+    --surface2: #f0efe9;
+    --border:   #d8d6ce;
+    --border2:  #c2c0b6;
+    --text:     #1a1a18;
+    --text2:    #5a5a54;
+    --text3:    #8a8a82;
+    --blue:     #185fa5;
+    --blue-bg:  #e6f1fb;
+    --blue-bd:  #85b7eb;
+    --red:      #a32d2d;
+    --red-bg:   #fcebeb;
+    --red-bd:   #f09595;
+    --amber:    #854f0b;
+    --amber-bg: #faeeda;
+    --amber-bd: #ef9f27;
+    --green:    #3b6d11;
+    --green-bg: #eaf3de;
+    --green-bd: #97c459;
+    --teal:     #0f6e56;
+    --teal-bg:  #e1f5ee;
+    --radius:   8px;
+    --radius-lg:12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:       #1a1a18;
+      --surface:  #26261f;
+      --surface2: #2e2e26;
+      --border:   #3a3a32;
+      --border2:  #4a4a40;
+      --text:     #e8e8e0;
+      --text2:    #a8a89e;
+      --text3:    #6a6a62;
+      --blue:     #85b7eb;
+      --blue-bg:  #0c447c;
+      --blue-bd:  #185fa5;
+      --red:      #f09595;
+      --red-bg:   #791f1f;
+      --red-bd:   #a32d2d;
+      --amber:    #fac775;
+      --amber-bg: #633806;
+      --amber-bd: #854f0b;
+      --green:    #c0dd97;
+      --green-bg: #27500a;
+      --green-bd: #3b6d11;
+      --teal:     #9fe1cb;
+      --teal-bg:  #085041;
+      --teal-bd:  #0f6e56;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px 16px;
+  }
+  .course-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .relevance {
+    font-size: 13px;
+    color: var(--text2);
+    background: var(--blue-bg);
+    border-left: 3px solid var(--blue-bd);
+    padding: 8px 12px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-top: 12px;
+  }
+  .relevance strong { color: var(--blue); }
+  /* ── MAIN LAYOUT ── */
+  .main { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+  /* ── CATEGORY BUTTONS ── */
+  .cat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .cat-btn {
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .15s, background .15s;
+  }
+  .cat-btn:hover { border-color: var(--border2); }
+  .cat-btn.active { border-color: var(--blue-bd); background: var(--blue-bg); }
+  .cat-btn .cat-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--text); display: block; margin-bottom: 2px;
+  }
+  .cat-btn.active .cat-name { color: var(--blue); }
+  .cat-btn .cat-sub { font-size: 12px; color: var(--text3); }
+  /* ── ENGINE GRID ── */
+  .engine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .eng-btn {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text2);
+    text-align: center;
+    line-height: 1.4;
+    transition: all .15s;
+  }
+  .eng-btn:hover { border-color: var(--border2); color: var(--text); }
+  .eng-btn.active {
+    border-color: var(--blue-bd);
+    background: var(--blue-bg);
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .eng-btn .eng-sub { font-size: 10px; opacity: .7; display: block; margin-top: 2px; }
+  /* ── DETAIL PANEL ── */
+  .detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 600px) { .detail { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .placeholder {
+    font-size: 13px; color: var(--text3);
+    text-align: center;
+    line-height: 1.8;
+    width: 100%;
+  }
+  .eng-title { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .badge {
+    display: inline-block; font-size: 11px;
+    padding: 2px 10px; border-radius: 99px;
+    margin-bottom: 12px; font-weight: 600;
+  }
+  .badge-ice { background: var(--red-bg); color: var(--red); }
+  .badge-ece { background: var(--blue-bg); color: var(--blue); }
+  .eng-desc { font-size: 13px; color: var(--text2); line-height: 1.65; margin-bottom: 14px; }
+  .specs-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 8px;
+  }
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 5px 0; border-bottom: 1px solid var(--border);
+    font-size: 12px; gap: 8px;
+  }
+  .spec-row:last-of-type { border-bottom: none; }
+  .spec-l { color: var(--text2); }
+  .spec-v { color: var(--text); font-weight: 600; text-align: right; }
+  .course-ref {
+    margin-top: 14px; font-size: 12px;
+    color: var(--text3); border-top: 1px solid var(--border); padding-top: 10px;
+  }
+  .course-ref span { color: var(--blue); font-weight: 600; }
+  /* ── DIAGRAM PANEL ── */
+  .diagram-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    min-height: 320px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .diagram-panel svg { max-width: 100%; }
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; font-size: 11px; color: var(--text3);
+    padding: 24px 16px; border-top: 1px solid var(--border);
+    margin-top: 32px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="course-label">Mobile Power Course — Topic 1: Introduction</div>
+  <h1>Engine Families Explorer</h1>
+  <div class="relevance">
+    <strong>Why this matters:</strong> Every engine you will study in this course — from a chainsaw to a ship — belongs to one of two families. Knowing the family tells you the working principle immediately.
+  </div>
+</header>
+
+<div class="main">
+  <div class="cat-row">
+    <button class="cat-btn active" id="btn-ice" onclick="selectCat('ice')">
+      <span class="cat-name">&#x1F525; Internal combustion engines</span>
+      <span class="cat-sub">Fuel burns inside the working cylinder</span>
+    </button>
+    <button class="cat-btn" id="btn-ece" onclick="selectCat('ece')">
+      <span class="cat-name">&#x1F4A7; External combustion engines</span>
+      <span class="cat-sub">Fuel burns outside the working fluid</span>
+    </button>
+  </div>
+
+  <div class="engine-grid" id="engine-grid"></div>
+
+  <div class="detail">
+    <div class="panel" id="info-panel">
+      <div class="placeholder">Select an engine family and engine type above.</div>
+    </div>
+    <div class="diagram-panel" id="diagram-panel">
+      <div class="placeholder">Cross-section diagram<br>appears here</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Mobile Power Course &mdash; Interactive Teaching Tools &mdash; Topic 1 of 15
+</footer>
+
+<script>
+const T = (x) => `<text x="${x.x}" y="${x.y}" text-anchor="${x.a||'middle'}" dominant-baseline="central" fill="${x.f||'var(--text2)'}" font-size="${x.s||12}" font-family="-apple-system,sans-serif" ${x.w?'font-weight="600"':''}>${x.t}</text>`;
+const R = (x) => `<rect x="${x.x}" y="${x.y}" width="${x.w}" height="${x.h}" rx="${x.rx||4}" fill="${x.f||'var(--surface2)'}" stroke="${x.s||'var(--border)'}" stroke-width="${x.sw||1}"/>`;
+const C = (x) => `<circle cx="${x.cx}" cy="${x.cy}" r="${x.r}" fill="${x.f||'var(--surface2)'}" stroke="${x.s||'var(--border)'}" stroke-width="${x.sw||1}"/>`;
+const L = (x) => `<line x1="${x.x1}" y1="${x.y1}" x2="${x.x2}" y2="${x.y2}" stroke="${x.s||'var(--border2)'}" stroke-width="${x.w||1}"/>`;
+const P = (x) => `<path d="${x.d}" fill="${x.f||'none'}" stroke="${x.s||'var(--border2)'}" stroke-width="${x.w||1}"/>`;
+function lbl(lx,ly,tx,ty,t,right) {
+  const a = right ? 'start' : 'end';
+  const ox = right ? 4 : -4;
+  return `<line x1="${lx}" y1="${ly}" x2="${tx}" y2="${ty}" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3 2"/>
+  ${T({x:tx+ox,y:ty,t,a,s:11})}`;
+}
+function svg(h,body) {
+  return `<svg width="100%" viewBox="0 0 280 ${h}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
+
+const engines = {
+  ice:[
+    {id:'otto',name:'Otto cycle engine',sub:'4-stroke gasoline',
+     desc:'The most common automotive engine. A spark plug ignites a compressed fuel-air mixture. Completes one power cycle every two crankshaft revolutions. Used in cars, motorcycles, and small equipment.',
+     specs:[
+       {l:'Compression ratio',v:'8:1 – 12:1'},
+       {l:'Typical RPM',v:'600 – 7,000 rpm'},
+       {l:'Thermal efficiency',v:'25 – 35%'},
+       {l:'Ignition',v:'Spark ignition (SI)'},
+       {l:'Common fuels',v:'Gasoline, ethanol'},
+       {l:'Applications',v:'Cars, motorcycles, generators'},
+     ],
+     course:'Topics 3, 9',
+     svgFn:'otto'},
+    {id:'diesel',name:'Diesel engine',sub:'4-stroke diesel',
+     desc:'Air alone is compressed until hot enough to ignite injected fuel — no spark plug needed. Higher compression ratio than Otto engines gives better efficiency and more torque. Used in trucks, agriculture, and marine.',
+     specs:[
+       {l:'Compression ratio',v:'14:1 – 25:1'},
+       {l:'Typical RPM',v:'600 – 4,500 rpm'},
+       {l:'Thermal efficiency',v:'35 – 45%'},
+       {l:'Ignition',v:'Compression ignition (CI)'},
+       {l:'Common fuels',v:'Diesel, biodiesel'},
+       {l:'Applications',v:'Trucks, tractors, ships'},
+     ],
+     course:'Topics 4, 9',
+     svgFn:'diesel'},
+    {id:'two',name:'Two-stroke engine',sub:'gasoline or diesel',
+     desc:'Completes the full power cycle in one crankshaft revolution. Uses ports cut into the cylinder wall instead of valves. Lightweight and simple. Higher power-to-weight ratio than 4-stroke.',
+     specs:[
+       {l:'Power strokes',v:'1 per revolution'},
+       {l:'Typical RPM',v:'2,000 – 10,000 rpm'},
+       {l:'Power-to-weight',v:'Higher than 4-stroke'},
+       {l:'Ignition',v:'SI or CI'},
+       {l:'Common fuels',v:'Gas-oil mix, diesel'},
+       {l:'Applications',v:'Chainsaws, outboards, mopeds'},
+     ],
+     course:'Topic 10',
+     svgFn:'two'},
+    {id:'wankel',name:'Wankel rotary engine',sub:'rotary ICE',
+     desc:'Uses a triangular rotor spinning eccentrically inside a housing — no pistons. Very smooth, high RPM, compact. Demonstrates that the Otto cycle does not require a piston-cylinder arrangement.',
+     specs:[
+       {l:'Rotor geometry',v:'Epitrochoidal housing'},
+       {l:'Typical RPM',v:'1,000 – 9,000 rpm'},
+       {l:'Power-to-weight',v:'Very high'},
+       {l:'Ignition',v:'Spark ignition'},
+       {l:'Common fuels',v:'Gasoline, hydrogen (research)'},
+       {l:'Applications',v:'Sports cars, UAVs'},
+     ],
+     course:'Topic 9 (reference)',
+     svgFn:'wankel'},
+    {id:'gasturbine',name:'Gas turbine',sub:'continuous combustion ICE',
+     desc:'Air is continuously compressed, mixed with fuel, and burned. Expanding gases spin a turbine. No pistons or reciprocating parts. Used in jet engines, power plants, and large ships.',
+     specs:[
+       {l:'Compression ratio',v:'15:1 – 40:1'},
+       {l:'Turbine inlet temp.',v:'Up to 1,700 °C'},
+       {l:'Thermal efficiency',v:'30 – 45%'},
+       {l:'Ignition',v:'Continuous combustion'},
+       {l:'Common fuels',v:'Jet fuel, natural gas'},
+       {l:'Applications',v:'Aircraft, power plants, ships'},
+     ],
+     course:'Reference — cycle comparison',
+     svgFn:'gasturbine'},
+  ],
+  ece:[
+    {id:'steam',name:'Steam engine',sub:'external combustion — reciprocating',
+     desc:'Water is heated by an external flame in a boiler. Steam pressure pushes a piston. The working fluid never contacts combustion gases. Historical foundation of thermodynamics — used in locomotives and early industry.',
+     specs:[
+       {l:'Working fluid',v:'Water / steam'},
+       {l:'Steam pressure',v:'0.5 – 3 MPa'},
+       {l:'Thermal efficiency',v:'8 – 25%'},
+       {l:'Combustion',v:'External boiler'},
+       {l:'Common fuels',v:'Coal, wood, oil, gas'},
+       {l:'Applications',v:'Locomotives, ships (historic)'},
+     ],
+     course:'Reference — thermodynamics context',
+     svgFn:'steam'},
+    {id:'stirling',name:'Stirling engine',sub:'external combustion — closed cycle',
+     desc:'A closed gas cycle — the same working gas circulates forever. Heat is applied and removed externally. Very quiet, runs on any heat source including solar. Demonstrates the regenerator concept.',
+     specs:[
+       {l:'Working fluid',v:'Air, hydrogen, or helium'},
+       {l:'Cycle type',v:'Closed regenerative cycle'},
+       {l:'Thermal efficiency',v:'Up to 40% (theoretical)'},
+       {l:'Combustion',v:'External — any heat source'},
+       {l:'Common fuels',v:'Any heat source'},
+       {l:'Applications',v:'CHP units, submarines, solar'},
+     ],
+     course:'Reference — thermodynamics context',
+     svgFn:'stirling'},
+  ]
+};
+
+const diagrams = {
+  otto: () => svg(285, `
+    ${R({x:70,y:40,w:140,h:200,rx:6,f:'var(--surface2)',s:'var(--border2)',sw:1.5})}
+    ${R({x:90,y:52,w:100,h:150,rx:2,f:'var(--surface)',s:'var(--border)',sw:0.5})}
+    ${R({x:90,y:52,w:100,h:32,rx:2,f:'var(--red-bg)',s:'var(--red-bd)',sw:0.5})}
+    ${R({x:92,y:152,w:96,h:36,rx:3,f:'var(--blue-bg)',s:'var(--blue-bd)',sw:1})}
+    ${R({x:97,y:57,w:18,h:16,rx:2,f:'var(--surface2)',s:'var(--border2)',sw:1})}
+    ${R({x:165,y:57,w:18,h:16,rx:2,f:'var(--surface2)',s:'var(--border2)',sw:1})}
+    ${C({cx:140,cy:56,r:6,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1.5})}
+    ${L({x1:140,y1:188,x2:140,y2:222,s:'var(--border2)',w:2.5})}
+    ${C({cx:140,cy:230,r:12,f:'var(--surface2)',s:'var(--border2)',sw:1.5})}
+    ${lbl(106,65,42,58,'Intake valve',false)}
+    ${lbl(174,65,238,58,'Exhaust valve',true)}
+    ${lbl(140,56,238,40,'Spark plug',true)}
+    ${lbl(140,170,238,130,'Piston',true)}
+    ${lbl(140,230,238,220,'Crankshaft',true)}
+    ${T({x:140,y:272,t:'Otto — 4-stroke gasoline',s:11,f:'var(--text3)'})}
+  `),
+  diesel: () => svg(285, `
+    ${R({x:70,y:40,w:140,h:200,rx:6,f:'var(--surface2)',s:'var(--border2)',sw:1.5})}
+    ${R({x:90,y:52,w:100,h:150,rx:2,f:'var(--surface)',s:'var(--border)',sw:0.5})}
+    ${R({x:90,y:52,w:100,h:18,rx:2,f:'var(--red-bg)',s:'var(--red-bd)',sw:0.5})}
+    ${R({x:92,y:132,w:96,h:36,rx:3,f:'var(--blue-bg)',s:'var(--blue-bd)',sw:1})}
+    ${P({d:'M137 40 L137 54 L143 54 L143 40 Z',f:'var(--text3)'})}
+    ${C({cx:140,cy:56,r:5,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1.5})}
+    ${L({x1:140,y1:168,x2:140,y2:215,s:'var(--border2)',w:2.5})}
+    ${C({cx:140,cy:223,r:12,f:'var(--surface2)',s:'var(--border2)',sw:1.5})}
+    ${lbl(140,56,238,44,'Fuel injector',true)}
+    ${lbl(140,150,238,125,'Piston (high CR)',true)}
+    ${lbl(140,223,238,220,'Crankshaft',true)}
+    ${lbl(90,56,42,68,'No spark plug',false)}
+    ${T({x:140,y:272,t:'Diesel — compression ignition',s:11,f:'var(--text3)'})}
+  `),
+  two: () => svg(285, `
+    ${R({x:70,y:40,w:140,h:200,rx:6,f:'var(--surface2)',s:'var(--border2)',sw:1.5})}
+    ${R({x:90,y:52,w:100,h:150,rx:2,f:'var(--surface)',s:'var(--border)',sw:0.5})}
+    ${R({x:92,y:142,w:96,h:36,rx:3,f:'var(--blue-bg)',s:'var(--blue-bd)',sw:1})}
+    ${C({cx:140,cy:56,r:6,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1.5})}
+    ${R({x:70,y:172,w:20,h:26,rx:2,f:'var(--teal-bg)',s:'var(--teal-bd)',sw:1})}
+    ${R({x:190,y:166,w:20,h:26,rx:2,f:'var(--red-bg)',s:'var(--red-bd)',sw:1})}
+    ${R({x:84,y:242,w:112,h:28,rx:4,f:'var(--surface2)',s:'var(--border2)',sw:1})}
+    ${L({x1:140,y1:178,x2:140,y2:242,s:'var(--border2)',w:2})}
+    ${C({cx:140,cy:250,r:9,f:'var(--surface2)',s:'var(--border2)',sw:1.5})}
+    ${lbl(140,56,238,48,'Spark plug',true)}
+    ${lbl(80,185,30,165,'Transfer port',false)}
+    ${lbl(200,179,238,192,'Exhaust port',true)}
+    ${lbl(140,246,238,238,'Crankcase',true)}
+    ${T({x:140,y:275,t:'Two-stroke — ports replace valves',s:11,f:'var(--text3)'})}
+  `),
+  wankel: () => svg(275, `
+    <ellipse cx="140" cy="138" rx="90" ry="80" fill="var(--surface2)" stroke="var(--border2)" stroke-width="1.5"/>
+    <polygon points="140,72 196,178 84,178" fill="var(--blue-bg)" stroke="var(--blue-bd)" stroke-width="1.5"/>
+    ${C({cx:140,cy:138,r:10,f:'var(--red-bg)',s:'var(--red-bd)',sw:1.5})}
+    ${C({cx:222,cy:108,r:6,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1.5})}
+    ${C({cx:224,cy:140,r:6,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1.5})}
+    ${R({x:36,y:104,w:18,h:22,rx:2,f:'var(--teal-bg)',s:'var(--teal-bd)',sw:1})}
+    ${lbl(196,178,238,190,'Rotor (triangle)',true)}
+    ${lbl(218,124,238,62,'Spark plugs',true)}
+    ${lbl(140,138,238,135,'Eccentric shaft',true)}
+    ${lbl(45,115,30,172,'Intake',false)}
+    ${T({x:140,y:245,t:'Wankel rotary — no pistons',s:11,f:'var(--text3)'})}
+    ${T({x:140,y:260,t:'Three chambers rotate continuously',s:11,f:'var(--text3)'})}
+  `),
+  gasturbine: () => svg(240, `
+    ${R({x:18,y:75,w:72,h:88,rx:4,f:'var(--blue-bg)',s:'var(--blue-bd)',sw:1})}
+    ${T({x:54,y:110,t:'Compressor',s:12,f:'var(--blue)',w:true})}
+    ${T({x:54,y:126,t:'↑ pressure',s:10,f:'var(--blue)'})}
+    ${R({x:100,y:62,w:80,h:114,rx:6,f:'var(--red-bg)',s:'var(--red-bd)',sw:1})}
+    ${T({x:140,y:108,t:'Combustion',s:12,f:'var(--red)',w:true})}
+    ${T({x:140,y:124,t:'chamber',s:12,f:'var(--red)',w:true})}
+    ${R({x:42,y:44,w:24,h:22,rx:2,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1})}
+    ${T({x:54,y:55,t:'Fuel in',s:10,f:'var(--amber)'})}
+    ${L({x1:54,y1:66,x2:54,y2:75,s:'var(--amber-bd)',w:1})}
+    ${R({x:190,y:75,w:72,h:88,rx:4,f:'var(--green-bg)',s:'var(--green-bd)',sw:1})}
+    ${T({x:226,y:110,t:'Turbine',s:12,f:'var(--green)',w:true})}
+    ${T({x:226,y:126,t:'↓ extracts work',s:10,f:'var(--green)'})}
+    ${L({x1:90,y1:119,x2:100,y2:119,s:'var(--border2)',w:1.5})}
+    ${L({x1:180,y1:119,x2:190,y2:119,s:'var(--border2)',w:1.5})}
+    ${P({d:'M4 119 L16 119',s:'var(--border2)',w:1.5})}
+    ${T({x:10,y:108,t:'Air in',s:10,f:'var(--text3)'})}
+    ${P({d:'M262 119 L274 119',s:'var(--border2)',w:1.5})}
+    ${T({x:268,y:108,t:'Exhaust',s:10,f:'var(--text3)',a:'middle'})}
+    ${L({x1:18,y1:148,x2:262,y2:148,s:'var(--border)',w:0.5})}
+    ${T({x:140,y:156,t:'— shaft connects compressor to turbine —',s:10,f:'var(--text3)'})}
+    ${T({x:140,y:224,t:'Gas turbine — continuous combustion, no pistons',s:11,f:'var(--text3)'})}
+  `),
+  steam: () => svg(290, `
+    ${R({x:20,y:155,w:112,h:90,rx:6,f:'var(--red-bg)',s:'var(--red-bd)',sw:1.5})}
+    ${T({x:76,y:185,t:'Boiler',s:13,f:'var(--red)',w:true})}
+    ${T({x:76,y:202,t:'(external heat)',s:11,f:'var(--red)'})}
+    ${R({x:30,y:248,w:92,h:28,rx:3,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1})}
+    ${T({x:76,y:262,t:'Firebox / fuel',s:11,f:'var(--amber)'})}
+    ${L({x1:132,y1:185,x2:175,y2:185,s:'var(--red-bd)',w:2})}
+    ${T({x:154,y:177,t:'Steam',s:11,f:'var(--red)'})}
+    ${R({x:168,y:138,w:82,h:112,rx:4,f:'var(--surface2)',s:'var(--border2)',sw:1.5})}
+    ${R({x:174,y:152,w:70,h:36,rx:3,f:'var(--blue-bg)',s:'var(--blue-bd)',sw:1})}
+    ${L({x1:244,y1:170,x2:260,y2:170,s:'var(--border2)',w:2})}
+    ${P({d:'M76 248 Q130 270 209 248',f:'none',s:'var(--blue-bd)',w:1})}
+    ${T({x:140,y:276,t:'Condensate return',s:10,f:'var(--text3)'})}
+    ${lbl(209,170,238,158,'Piston',true)}
+    ${lbl(76,175,18,148,'Boiler',false)}
+    ${T({x:140,y:40,t:'Working fluid: water / steam',s:11,f:'var(--text3)'})}
+    ${T({x:140,y:56,t:'Combustion never contacts the piston',s:11,f:'var(--text3)'})}
+  `),
+  stirling: () => svg(285, `
+    ${R({x:28,y:78,w:88,h:140,rx:4,f:'var(--red-bg)',s:'var(--red-bd)',sw:1.5})}
+    ${T({x:72,y:100,t:'Hot cylinder',s:12,f:'var(--red)',w:true})}
+    ${T({x:72,y:116,t:'(heater side)',s:11,f:'var(--red)'})}
+    ${R({x:164,y:78,w:88,h:140,rx:4,f:'var(--blue-bg)',s:'var(--blue-bd)',sw:1.5})}
+    ${T({x:208,y:100,t:'Cold cylinder',s:12,f:'var(--blue)',w:true})}
+    ${T({x:208,y:116,t:'(cooler side)',s:11,f:'var(--blue)'})}
+    ${R({x:118,y:96,w:24,h:106,rx:3,f:'var(--surface2)',s:'var(--border2)',sw:1})}
+    ${T({x:130,y:142,t:'R',s:14,f:'var(--text2)',w:true})}
+    ${T({x:130,y:158,t:'regen',s:10,f:'var(--text3)'})}
+    ${R({x:34,y:158,w:76,h:22,rx:3,f:'var(--surface2)',s:'var(--border2)',sw:1})}
+    ${R({x:170,y:138,w:76,h:22,rx:3,f:'var(--surface2)',s:'var(--border2)',sw:1})}
+    ${R({x:36,y:224,w:72,h:24,rx:3,f:'var(--amber-bg)',s:'var(--amber-bd)',sw:1})}
+    ${T({x:72,y:236,t:'Heat source',s:11,f:'var(--amber)'})}
+    ${R({x:172,y:224,w:72,h:24,rx:3,f:'var(--surface2)',s:'var(--border)',sw:1})}
+    ${T({x:208,y:236,t:'Cold sink',s:11,f:'var(--text2)'})}
+    ${T({x:140,y:44,t:'Closed cycle — same gas circulates continuously',s:11,f:'var(--text3)'})}
+    ${T({x:140,y:60,t:'No combustion inside the engine',s:11,f:'var(--text3)'})}
+    ${T({x:140,y:275,t:'Stirling engine — closed external combustion',s:11,f:'var(--text3)'})}
+  `)
+};
+
+let currentCat = 'ice';
+
+function selectCat(cat) {
+  currentCat = cat;
+  document.getElementById('btn-ice').classList.toggle('active', cat==='ice');
+  document.getElementById('btn-ece').classList.toggle('active', cat==='ece');
+  renderGrid();
+  document.getElementById('info-panel').innerHTML = '<div class="placeholder">Select an engine family and engine type above.</div>';
+  document.getElementById('diagram-panel').innerHTML = '<div class="placeholder">Cross-section diagram<br>appears here</div>';
+}
+
+function renderGrid() {
+  const g = document.getElementById('engine-grid');
+  g.innerHTML = engines[currentCat].map(e =>
+    `<button class="eng-btn" id="eb-${e.id}" onclick="selectEngine('${e.id}')">
+      ${e.name}<span class="eng-sub">${e.sub}</span>
+    </button>`
+  ).join('');
+}
+
+function selectEngine(id) {
+  const all = [...engines.ice,...engines.ece];
+  const e = all.find(x=>x.id===id);
+  if(!e) return;
+  document.querySelectorAll('.eng-btn').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('eb-'+id);
+  if(btn) btn.classList.add('active');
+  const isICE = engines.ice.find(x=>x.id===id);
+  const badgeClass = isICE ? 'badge-ice' : 'badge-ece';
+  const badgeLabel = isICE ? 'Internal combustion' : 'External combustion';
+  document.getElementById('info-panel').style.justifyContent = 'flex-start';
+  document.getElementById('info-panel').innerHTML = `
+    <p class="eng-title">${e.name}</p>
+    <span class="badge ${badgeClass}">${badgeLabel}</span>
+    <p class="eng-desc">${e.desc}</p>
+    <div class="specs-label">Key specifications</div>
+    ${e.specs.map(s=>`<div class="spec-row"><span class="spec-l">${s.l}</span><span class="spec-v">${s.v}</span></div>`).join('')}
+    <div class="course-ref">Course topics: <span>${e.course}</span></div>
+  `;
+  const dp = document.getElementById('diagram-panel');
+  dp.innerHTML = diagrams[e.svgFn]();
+}
+
+renderGrid();
+</script>
+</body>
+</html>

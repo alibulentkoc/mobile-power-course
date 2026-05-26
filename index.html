@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Power Course — Interactive Tools</title>
+<style>
+  :root {
+    --bg:       #f5f5f0;
+    --surface:  #ffffff;
+    --surface2: #f0efe9;
+    --border:   #d8d6ce;
+    --border2:  #c2c0b6;
+    --text:     #1a1a18;
+    --text2:    #5a5a54;
+    --text3:    #8a8a82;
+    --blue:     #185fa5;
+    --blue-bg:  #e6f1fb;
+    --blue-bd:  #85b7eb;
+    --green:    #3b6d11;
+    --green-bg: #eaf3de;
+    --green-bd: #97c459;
+    --amber:    #854f0b;
+    --amber-bg: #faeeda;
+    --amber-bd: #ef9f27;
+    --red:      #a32d2d;
+    --red-bg:   #fcebeb;
+    --red-bd:   #f09595;
+    --radius:   8px;
+    --radius-lg:12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:       #1a1a18;
+      --surface:  #26261f;
+      --surface2: #2e2e26;
+      --border:   #3a3a32;
+      --border2:  #4a4a40;
+      --text:     #e8e8e0;
+      --text2:    #a8a89e;
+      --text3:    #6a6a62;
+      --blue:     #85b7eb;
+      --blue-bg:  #0c447c;
+      --blue-bd:  #185fa5;
+      --green:    #c0dd97;
+      --green-bg: #27500a;
+      --green-bd: #3b6d11;
+      --amber:    #fac775;
+      --amber-bg: #633806;
+      --amber-bd: #854f0b;
+      --red:      #f09595;
+      --red-bg:   #791f1f;
+      --red-bd:   #a32d2d;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 24px 22px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .course-tag {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 6px;
+  }
+  header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  header p { font-size: 14px; color: var(--text2); max-width: 560px; }
+  /* ── MAIN ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+  /* ── SECTION ── */
+  .section { margin-bottom: 32px; }
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--text2); letter-spacing: .04em; text-transform: uppercase; }
+  .section-count { font-size: 11px; color: var(--text3); }
+  /* ── TOOL CARD ── */
+  .tool-card {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    transition: border-color .15s;
+    text-decoration: none;
+  }
+  .tool-card.live:hover { border-color: var(--blue-bd); }
+  .tool-card.locked { opacity: .6; cursor: default; }
+  .tool-num {
+    min-width: 28px; height: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    flex-shrink: 0;
+  }
+  .tool-card.live .tool-num {
+    background: var(--blue-bg);
+    border-color: var(--blue-bd);
+    color: var(--blue);
+  }
+  .tool-body { flex: 1; min-width: 0; }
+  .tool-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .tool-card.live .tool-title { color: var(--blue); }
+  .tool-desc { font-size: 12px; color: var(--text3); }
+  .tool-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 99px;
+    letter-spacing: .02em;
+  }
+  .b-type { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+  .b-level { background: var(--amber-bg); color: var(--amber); }
+  .b-live { background: var(--green-bg); color: var(--green); }
+  .b-soon { background: var(--surface2); color: var(--text3); }
+  .tool-arrow { font-size: 16px; color: var(--blue); flex-shrink: 0; }
+  .locked-icon { font-size: 14px; color: var(--text3); flex-shrink: 0; }
+  /* ── HOW TO EDIT ── */
+  .how-to {
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-bd);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    font-size: 12px; color: var(--amber);
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+  .how-to strong { font-weight: 700; }
+  code {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    color: var(--text);
+  }
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; font-size: 11px; color: var(--text3);
+    padding: 20px 16px;
+    border-top: 1px solid var(--border);
+    max-width: 860px; margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="course-tag">Interactive Teaching Tools</div>
+  <h1>Mobile Power Course</h1>
+  <p>Internal and external combustion engines — interactive visualizations, simulations, and calculators.</p>
+</header>
+
+<div class="main">
+
+  <!-- HOW TO CONTROL RELEASES -->
+  <div class="how-to">
+    <strong>&#x1F527; Instructor release control:</strong>
+    To make a tool live, find its entry below and change <code>released: false</code> to <code>released: true</code>.
+    To lock it again, change it back. Then re-upload this file to GitHub.
+    The tool file must also be uploaded to the same folder.
+  </div>
+
+  <div id="course-menu"></div>
+
+</div>
+
+<footer>
+  Mobile Power Course &mdash; Interactive Teaching Tools
+</footer>
+
+<script>
+/*
+ ══════════════════════════════════════════════════════════
+  RELEASE CONTROL — edit this list to publish tools
+  released: true  = students see a clickable link
+  released: false = students see "coming soon"
+ ══════════════════════════════════════════════════════════
+*/
+const sections = [
+  {
+    title: 'Introduction',
+    tools: [
+      {
+        num: 1,
+        title: 'Engine Families Explorer',
+        desc: 'Internal vs external combustion — all engine types, specs, and cross-section diagrams',
+        type: 'Conceptual',
+        level: 'All levels',
+        file: 'intro_engine_families.html',
+        released: true   // ← change to false to lock
+      },
+    ]
+  },
+  {
+    title: 'Basic Thermodynamics',
+    tools: [
+      {
+        num: 2,
+        title: 'Units & Quantities Converter',
+        desc: 'Pressure, temperature, volume, work — unit conversions with context',
+        type: 'Measurement',
+        level: 'All levels',
+        file: 'thermo_units_converter.html',
+        released: false
+      },
+      {
+        num: 2,
+        title: 'Ideal Gas Law Explorer',
+        desc: 'Interactive P-V-T sliders — see how pressure, volume, and temperature relate',
+        type: 'Conceptual',
+        level: 'Level 2–3',
+        file: 'thermo_ideal_gas.html',
+        released: false
+      },
+      {
+        num: 2,
+        title: 'Polytropic Process Plotter',
+        desc: 'Adjust the polytropic exponent n and watch the P-V curve change',
+        type: 'Simulation',
+        level: 'Level 3',
+        file: 'thermo_polytropic.html',
+        released: false
+      },
+      {
+        num: 2,
+        title: 'Compression Ratio & Displacement Calculator',
+        desc: 'Bore, stroke, clearance volume — see how geometry defines engine character',
+        type: 'Conceptual',
+        level: 'Level 2–3',
+        file: 'thermo_cr_displacement.html',
+        released: false
+      },
+    ]
+  },
+  {
+    title: 'Engine Cycles',
+    tools: [
+      {
+        num: 3,
+        title: 'Otto Cycle P-V Diagram',
+        desc: 'Interactive pressure-volume diagram for the theoretical Otto cycle',
+        type: 'Simulation',
+        level: 'Level 2–3',
+        file: 'cycle_otto_pv.html',
+        released: false
+      },
+      {
+        num: 4,
+        title: 'Diesel & Dual Cycle P-V Diagram',
+        desc: 'Compare Diesel and dual cycles — adjust cutoff ratio and see efficiency change',
+        type: 'Simulation',
+        level: 'Level 2–3',
+        file: 'cycle_diesel_pv.html',
+        released: false
+      },
+      {
+        num: 9,
+        title: 'Four-Stroke Cycle Animator',
+        desc: 'Step through intake, compression, power, and exhaust strokes',
+        type: 'Animation',
+        level: 'All levels',
+        file: 'cycle_4stroke_animator.html',
+        released: false
+      },
+      {
+        num: 10,
+        title: 'Two-Stroke Cycle Animator',
+        desc: 'See how two-stroke engines complete the cycle in one revolution',
+        type: 'Animation',
+        level: 'All levels',
+        file: 'cycle_2stroke_animator.html',
+        released: false
+      },
+    ]
+  },
+  {
+    title: 'Engine Components',
+    tools: [
+      {
+        num: 6,
+        title: 'Valve Timing Diagram',
+        desc: 'Crank angle versus valve lift — intake and exhaust event visualization',
+        type: 'Simulation',
+        level: 'Level 2–3',
+        file: 'comp_valve_timing.html',
+        released: false
+      },
+      {
+        num: 7,
+        title: 'Piston Motion Animator',
+        desc: 'Crank angle to piston position — slider-controlled animation',
+        type: 'Animation',
+        level: 'All levels',
+        file: 'comp_piston_motion.html',
+        released: false
+      },
+      {
+        num: 8,
+        title: 'Crankshaft Rotation & TDC/BDC Visualizer',
+        desc: 'See how crankshaft rotation relates to piston position',
+        type: 'Animation',
+        level: 'All levels',
+        file: 'comp_crank_rotation.html',
+        released: false
+      },
+    ]
+  },
+  {
+    title: 'Performance',
+    tools: [
+      {
+        num: 11,
+        title: 'Torque, Power & RPM Plotter',
+        desc: 'Explore the relationship between torque, power, and engine speed',
+        type: 'Conceptual',
+        level: 'Level 2–3',
+        file: 'perf_torque_power_rpm.html',
+        released: false
+      },
+      {
+        num: 11,
+        title: 'Mean Effective Pressure Calculator',
+        desc: 'Calculate BMEP, IMEP, and FMEP from engine test data',
+        type: 'Measurement',
+        level: 'Level 3',
+        file: 'perf_mep_calculator.html',
+        released: false
+      },
+      {
+        num: 12,
+        title: 'Efficiency Dashboard',
+        desc: 'Thermal, mechanical, and volumetric efficiency — all in one view',
+        type: 'Conceptual',
+        level: 'Level 3',
+        file: 'perf_efficiency_dashboard.html',
+        released: false
+      },
+    ]
+  },
+  {
+    title: 'Fuels',
+    tools: [
+      {
+        num: 14,
+        title: 'Combustion Reaction Visualizer',
+        desc: 'Stoichiometric combustion — carbon, hydrogen, oxygen balance',
+        type: 'Conceptual',
+        level: 'Level 2–3',
+        file: 'fuel_combustion_reaction.html',
+        released: false
+      },
+      {
+        num: 15,
+        title: 'Heating Value Comparison Tool',
+        desc: 'Compare LHV and HHV across common fuels',
+        type: 'Measurement',
+        level: 'Level 2–3',
+        file: 'fuel_heating_value.html',
+        released: false
+      },
+    ]
+  },
+];
+
+/* ── RENDER ─────────────────────────────────────────────── */
+function render() {
+  const container = document.getElementById('course-menu');
+  container.innerHTML = sections.map(section => {
+    const liveCount = section.tools.filter(t=>t.released).length;
+    const tools = section.tools.map(tool => {
+      if (tool.released) {
+        return `
+          <a class="tool-card live" href="${tool.file}">
+            <div class="tool-num">${tool.num}</div>
+            <div class="tool-body">
+              <div class="tool-title">${tool.title}</div>
+              <div class="tool-desc">${tool.desc}</div>
+              <div class="tool-badges" style="margin-top:6px">
+                <span class="badge b-type">${tool.type}</span>
+                <span class="badge b-level">${tool.level}</span>
+                <span class="badge b-live">&#x2713; Available</span>
+              </div>
+            </div>
+            <div class="tool-arrow">&#x2192;</div>
+          </a>`;
+      } else {
+        return `
+          <div class="tool-card locked">
+            <div class="tool-num">${tool.num}</div>
+            <div class="tool-body">
+              <div class="tool-title" style="color:var(--text2)">${tool.title}</div>
+              <div class="tool-desc">${tool.desc}</div>
+              <div class="tool-badges" style="margin-top:6px">
+                <span class="badge b-type">${tool.type}</span>
+                <span class="badge b-level">${tool.level}</span>
+                <span class="badge b-soon">Coming soon</span>
+              </div>
+            </div>
+            <div class="locked-icon">&#x1F512;</div>
+          </div>`;
+      }
+    }).join('');
+
+    return `
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">${section.title}</span>
+          <span class="section-count">${liveCount} of ${section.tools.length} available</span>
+        </div>
+        ${tools}
+      </div>`;
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>
